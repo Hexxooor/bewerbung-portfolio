@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Das Kolb-Universum | Eine Reise vom Fundament zu den Sternen</title>
+    <meta name="description" content="Erleben Sie Patrick Kolbs außergewöhnliche Karriere als interaktive Reise durch das Universum">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&display=swap');
+        
+        :root {
+            --cosmos-black: #0a0a0a;
+            --nebula-purple: #6b46c1;
+            --star-white: #ffffff;
+            --comet-orange: #ff6b35;
+            --planet-blue: #0077be;
+            --galaxy-red: #d40024;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Mono', monospace;
+            background-color: var(--cosmos-black);
+            color: var(--star-white);
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        
+        #universe-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .cosmic-hud {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid var(--nebula-purple);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            max-width: 300px;
+        }
+        
+        .cosmic-hud h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 24px;
+            color: var(--star-white);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--nebula-purple);
+        }
+        
+        .navigation-log {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+        
+        .planet-info {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.9);
+            border: 2px solid var(--galaxy-red);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            max-width: 600px;
+            display: none;
+            animation: warpIn 0.5s ease-out;
+        }
+        
+        @keyframes warpIn {
+            from {
+                transform: translateX(-50%) scale(0) rotate(180deg);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+        
+        .planet-info h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            color: var(--comet-orange);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .planet-info p {
+            line-height: 1.8;
+            color: #ddd;
+        }
+        
+        .cosmic-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .cosmic-btn {
+            background: rgba(107, 70, 193, 0.3);
+            border: 2px solid var(--nebula-purple);
+            color: var(--star-white);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 2px;
+        }
+        
+        .cosmic-btn:hover {
+            background: var(--nebula-purple);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--nebula-purple);
+        }
+        
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--cosmos-black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .loading-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--star-white);
+            margin-bottom: 30px;
+            text-align: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        .loading-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--nebula-purple), var(--comet-orange), var(--galaxy-red));
+            animation: loading 3s ease-out forwards;
+        }
+        
+        @keyframes loading {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+        
+        .star-connection {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--star-white), transparent);
+            transform-origin: left center;
+            opacity: 0;
+            animation: starConnect 2s ease-in-out infinite;
+        }
+        
+        @keyframes starConnect {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.5; }
+        }
+        
+        .innovation-comet {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--comet-orange), transparent);
+            animation: cometFly 10s linear infinite;
+        }
+        
+        @keyframes cometFly {
+            from {
+                transform: translateX(-100px) translateY(0);
+            }
+            to {
+                transform: translateX(calc(100vw + 100px)) translateY(-200px);
+            }
+        }
+        
+        .quantum-menu {
+            position: fixed;
+            top: 50%;
+            right: -300px;
+            transform: translateY(-50%);
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid var(--nebula-purple);
+            border-radius: 20px 0 0 20px;
+            padding: 30px;
+            transition: right 0.5s ease;
+            z-index: 200;
+            width: 300px;
+        }
+        
+        .quantum-menu.active {
+            right: 0;
+        }
+        
+        .quantum-menu h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--comet-orange);
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .timeline-node {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-node:hover {
+            transform: translateX(10px);
+        }
+        
+        .node-year {
+            color: var(--galaxy-red);
+            font-weight: bold;
+            margin-right: 15px;
+            min-width: 80px;
+        }
+        
+        .node-title {
+            color: #ddd;
+            font-size: 14px;
+        }
+        
+        .contact-portal {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            z-index: 300;
+        }
+        
+        .portal-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 3px solid var(--galaxy-red);
+            background: radial-gradient(circle, var(--galaxy-red), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            animation: portalPulse 2s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+        
+        @keyframes portalPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--galaxy-red); }
+            50% { transform: scale(1.1); box-shadow: 0 0 40px var(--galaxy-red); }
+        }
+        
+        .portal-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .contact-options {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .contact-options.active {
+            display: flex;
+        }
+        
+        .contact-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .contact-option:nth-child(1) { animation-delay: 0.1s; background: var(--planet-blue); }
+        .contact-option:nth-child(2) { animation-delay: 0.2s; background: var(--comet-orange); }
+        .contact-option:nth-child(3) { animation-delay: 0.3s; background: var(--nebula-purple); }
+        
+        @media (max-width: 768px) {
+            .cosmic-hud {
+                top: 10px;
+                left: 10px;
+                padding: 15px;
+                max-width: 250px;
+            }
+            
+            .cosmic-hud h1 {
+                font-size: 20px;
+            }
+            
+            .planet-info {
+                bottom: 10px;
+                padding: 20px;
+                max-width: 90%;
+            }
+            
+            .cosmic-controls {
+                bottom: 10px;
+                right: 10px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .cosmic-btn {
+                padding: 10px 20px;
+                font-size: 10px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="global-nav.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-text">INITIALISIERE<br>KOLB-UNIVERSUM</div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- Main Universe Canvas -->
+    <canvas id="universe-canvas"></canvas>
+
+    <!-- Cosmic HUD -->
+    <div class="cosmic-hud">
+        <h1>PATRICK KOLB</h1>
+        <div class="navigation-log">
+            <p>AKTUELLER SEKTOR: <span id="currentSector">IT-FÜHRUNG</span></p>
+            <p>ERKUNDETE SYSTEME: <span id="exploredSystems">0</span>/7</p>
+            <p>INNOVATIONEN ENTDECKT: <span id="innovations">0</span>/5</p>
+            <p style="margin-top: 10px; color: var(--comet-orange);">
+                »Ich blicke nicht nur über den Tellerrand –<br>
+                ich blicke ins Universum.«
+            </p>
+        </div>
+    </div>
+
+    <!-- Planet Information Panel -->
+    <div class="planet-info" id="planetInfo">
+        <h2 id="planetTitle">Planet Name</h2>
+        <p id="planetDescription">Beschreibung</p>
+    </div>
+
+    <!-- Cosmic Controls -->
+    <div class="cosmic-controls">
+        <button class="cosmic-btn" onclick="toggleAutoRotate()">Auto-Pilot</button>
+        <button class="cosmic-btn" onclick="toggleTimeline()">Zeitlinie</button>
+        <button class="cosmic-btn" onclick="resetView()">Heimkehr</button>
+    </div>
+
+    <!-- Quantum Menu (Timeline) -->
+    <div class="quantum-menu" id="quantumMenu">
+        <h3>ZEITSPRUNG-NAVIGATION</h3>
+        <div class="timeline-node" onclick="jumpToPlanet(0)">
+            <span class="node-year">2024</span>
+            <span class="node-title">IT-Leiter Prinz</span>
+        </div>
+        <div class="timeline-node" onclick="jumpToPlanet(1)">
+            <span class="node-year">2020-23</span>
+            <span class="node-title">Head of IT Grass</span>
+        </div>
+        <div class="timeline-node" onclick="jumpToPlanet(2)">
+            <span class="node-year">2019</span>
+            <span class="node-title">Innovation: Katzengrass</span>
+        </div>
+        <div class="timeline-node" onclick="jumpToPlanet(3)">
+            <span class="node-year">2016-19</span>
+            <span class="node-title">IT System Engineer</span>
+        </div>
+        <div class="timeline-node" onclick="jumpToPlanet(4)">
+            <span class="node-year">2011-16</span>
+            <span class="node-title">Technischer Wandel</span>
+        </div>
+        <div class="timeline-node" onclick="jumpToPlanet(5)">
+            <span class="node-year">1999-03</span>
+            <span class="node-title">Fundament: Maurer</span>
+        </div>
+        <div class="timeline-node" onclick="jumpToPlanet(6)">
+            <span class="node-year">2003-07</span>
+            <span class="node-title">Bundeswehr & IT</span>
+        </div>
+    </div>
+
+    <!-- Contact Portal -->
+    <div class="contact-portal">
+        <div class="portal-btn" onclick="toggleContactOptions()">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z"></path>
+                <path d="M2 17L12 22L22 17"></path>
+                <path d="M2 12L12 17L22 12"></path>
+            </svg>
+        </div>
+        <div class="contact-options" id="contactOptions">
+            <div class="contact-option" onclick="makeCall()" title="Anrufen">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                </svg>
+            </div>
+            <div class="contact-option" onclick="sendEmail()" title="E-Mail">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+            </div>
+            <div class="contact-option" onclick="downloadCV()" title="Lebenslauf">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                    <line x1="9" y1="15" x2="12" y2="18"></line>
+                    <line x1="15" y1="15" x2="12" y2="18"></line>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Innovation Comets -->
+    <div class="innovation-comet" style="top: 20%; animation-delay: 0s;"></div>
+    <div class="innovation-comet" style="top: 50%; animation-delay: 5s;"></div>
+    <div class="innovation-comet" style="top: 80%; animation-delay: 8s;"></div>
+
+    <script>
+        // Three.js Scene Setup
+        let scene, camera, renderer;
+        let planets = [];
+        let stars = [];
+        let raycaster, mouse;
+        let autoRotate = false;
+        let selectedPlanet = null;
+        let exploredPlanets = new Set();
+
+        // Planet Data
+        const planetData = [
+            {
+                name: "PLANET PRINZ-ALPHA",
+                color: 0xd40024,
+                size: 2.5,
+                position: { x: 0, y: 0, z: 0 },
+                description: "IT-LEITER BEI PRINZ (2024-HEUTE)<br><br>Auf diesem Planeten herrscht vollständige digitale Kontrolle. Als oberster Architekt orchestriere ich die IT-Strategie eines ganzen Unternehmens-Universums. 12 Crew-Mitglieder folgen meiner Vision. Budget-Ressourcen in Millionenhöhe werden weise eingesetzt, um neue digitale Welten zu erschaffen.",
+                ring: true
+            },
+            {
+                name: "STATION GRASS-NEXUS",
+                color: 0x0077be,
+                size: 2.2,
+                position: { x: -15, y: 5, z: -10 },
+                description: "HEAD OF IT CLIENT SERVICES - GRASS GMBH (2020-2023)<br><br>Eine Raumstation mit 25 Spezialisten unter meinem Kommando. Hier führte ich die große Migration zu Microsoft 365 durch - 1.200+ Geräte wurden erfolgreich in die Cloud teleportiert. Die Implementierung von Jira Service Management reduzierte die Reaktionszeit um 40%."
+            },
+            {
+                name: "KOMET INNOVATION-1",
+                color: 0xff6b35,
+                size: 1.5,
+                position: { x: 20, y: -8, z: 5 },
+                description: "ERFINDUNGEN & INNOVATIONEN (2019-HEUTE)<br><br>Dieser Komet trägt meine Schöpfungen durch das Universum: Das revolutionäre Katzengrass-System und der lebensverändernde Medizintechnik-Sensor für ein Kind mit Mukoviszidose. Hier zeigt sich: Innovation kennt keine Grenzen.",
+                glow: true
+            },
+            {
+                name: "SATELLIT ENGINEER",
+                color: 0x00a86b,
+                size: 1.8,
+                position: { x: 10, y: -5, z: -15 },
+                description: "IT SYSTEM ENGINEER - GRASS GMBH (2016-2019)<br><br>In der Umlaufbahn der Enterprise-IT. 800+ Clients unter meiner Aufsicht. Hier entwickelte ich erste Automatisierungs-Algorithmen mit PowerShell und Python - die Grundlage für spätere Quantensprünge."
+            },
+            {
+                name: "NEBULA TRANSITION",
+                color: 0x6b46c1,
+                size: 1.6,
+                position: { x: -8, y: 12, z: 8 },
+                description: "TECHNISCHER ANGESTELLTER - GLASEREI NUBER (2011-2016)<br><br>Der Übergang vom physischen zum digitalen Raum. In diesem Nebel verschmolzen handwerkliches Können und technische Neugier zu einer neuen Identität."
+            },
+            {
+                name: "ASTEROID FUNDAMENT",
+                color: 0x8b4513,
+                size: 2.0,
+                position: { x: -20, y: -10, z: -5 },
+                description: "AUSBILDUNG ZUM MAURER - FA. DIETRICH (1999-2003)<br><br>Der wahre Anfang meiner Reise. Noch vor der Bundeswehr lernte ich hier die Baubranche von Grund auf kennen. Jeder Stein, den ich setzte, war ein Fundament für meine spätere digitale Architektur.",
+                texture: 'rocky'
+            },
+            {
+                name: "MILITÄR-BASIS ALPHA",
+                color: 0x556b2f,
+                size: 1.7,
+                position: { x: 15, y: 8, z: -20 },
+                description: "BUNDESWEHR & DEKRA AKADEMIE (2003-2007)<br><br>Nach der Maurerausbildung: Die Ausbildungsbasis, wo Disziplin auf Technologie traf. Als Fernmeldetechniker und IT-Systemelektroniker legte ich hier den Grundstein für strukturiertes Denken und technische Expertise."
+            }
+        ];
+
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x000000, 0.02);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 30);
+            camera.lookAt(0, 0, 0);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: document.getElementById('universe-canvas'),
+                antialias: true 
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            scene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+            pointLight.position.set(10, 10, 10);
+            scene.add(pointLight);
+
+            // Create starfield
+            createStarfield();
+
+            // Create planets
+            planetData.forEach((data, index) => {
+                createPlanet(data, index);
+            });
+
+            // Create connections between planets
+            createConnections();
+
+            // Raycaster for mouse interaction
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            // Event listeners
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('click', onMouseClick);
+
+            // Hide loading screen
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+            }, 3000);
+        }
+
+        function createStarfield() {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsMaterial = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.7,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            const starsVertices = [];
+            for (let i = 0; i < 10000; i++) {
+                const x = (Math.random() - 0.5) * 2000;
+                const y = (Math.random() - 0.5) * 2000;
+                const z = (Math.random() - 0.5) * 2000;
+                starsVertices.push(x, y, z);
+            }
+
+            starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starsVertices, 3));
+            const starField = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(starField);
+            stars.push(starField);
+        }
+
+        function createPlanet(data, index) {
+            const planetGroup = new THREE.Group();
+            
+            // Planet sphere
+            const geometry = new THREE.SphereGeometry(data.size, 32, 32);
+            const material = new THREE.MeshPhongMaterial({
+                color: data.color,
+                emissive: data.color,
+                emissiveIntensity: 0.2,
+                shininess: 100
+            });
+            
+            const planet = new THREE.Mesh(geometry, material);
+            planet.userData = { ...data, index };
+            planetGroup.add(planet);
+
+            // Add ring if specified
+            if (data.ring) {
+                const ringGeometry = new THREE.RingGeometry(data.size * 1.5, data.size * 2, 32);
+                const ringMaterial = new THREE.MeshBasicMaterial({
+                    color: data.color,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.rotation.x = Math.PI / 2;
+                planetGroup.add(ring);
+            }
+
+            // Add glow effect if specified
+            if (data.glow) {
+                const glowGeometry = new THREE.SphereGeometry(data.size * 1.3, 16, 16);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: data.color,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                planetGroup.add(glow);
+            }
+
+            // Position planet
+            planetGroup.position.set(data.position.x, data.position.y, data.position.z);
+            
+            scene.add(planetGroup);
+            planets.push(planetGroup);
+        }
+
+        function createConnections() {
+            // Create ethereal connections between planets
+            for (let i = 0; i < planets.length - 1; i++) {
+                const start = planets[i].position;
+                const end = planets[i + 1].position;
+                
+                const points = [];
+                points.push(new THREE.Vector3(start.x, start.y, start.z));
+                points.push(new THREE.Vector3(end.x, end.y, end.z));
+                
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({
+                    color: 0x6b46c1,
+                    transparent: true,
+                    opacity: 0.2
+                });
+                
+                const line = new THREE.Line(geometry, material);
+                scene.add(line);
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            // Subtle camera movement based on mouse position
+            if (!selectedPlanet) {
+                camera.position.x = 30 * mouse.x * 0.1;
+                camera.position.y = 10 + 10 * mouse.y * 0.1;
+                camera.lookAt(0, 0, 0);
+            }
+        }
+
+        function onMouseClick(event) {
+            raycaster.setFromCamera(mouse, camera);
+            
+            const intersects = raycaster.intersectObjects(planets.map(p => p.children[0]));
+            
+            if (intersects.length > 0) {
+                const clickedPlanet = intersects[0].object;
+                selectPlanet(clickedPlanet.userData);
+            }
+        }
+
+        function selectPlanet(planetData) {
+            selectedPlanet = planetData;
+            
+            // Show planet info
+            const infoPanel = document.getElementById('planetInfo');
+            document.getElementById('planetTitle').textContent = planetData.name;
+            document.getElementById('planetDescription').innerHTML = planetData.description;
+            infoPanel.style.display = 'block';
+            
+            // Update explored count
+            exploredPlanets.add(planetData.index);
+            document.getElementById('exploredSystems').textContent = exploredPlanets.size;
+            
+            // Update current sector
+            const sectorNames = ['IT-FÜHRUNG', 'CLOUD-MIGRATION', 'INNOVATION', 'ENGINEERING', 'TRANSFORMATION', 'FUNDAMENT', 'AUSBILDUNG'];
+            document.getElementById('currentSector').textContent = sectorNames[planetData.index] || 'UNBEKANNT';
+            
+            // Check for innovations
+            if (planetData.index === 2) {
+                document.getElementById('innovations').textContent = '2';
+            }
+            
+            // Zoom camera to planet
+            if (!planets[planetData.index]) {
+            console.error('Planet not found:', planetData.index);
+            return;
+        }
+        const targetPosition = planets[planetData.index].position;
+            animateCameraToPosition(
+                targetPosition.x + 10,
+                targetPosition.y + 5,
+                targetPosition.z + 10
+            );
+        }
+
+        function animateCameraToPosition(x, y, z) {
+            const startPos = camera.position.clone();
+            const endPos = new THREE.Vector3(x, y, z);
+            const duration = 2000;
+            const startTime = Date.now();
+            
+            function updateCamera() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+                
+                camera.position.lerpVectors(startPos, endPos, easeProgress);
+                camera.lookAt(0, 0, 0);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCamera);
+                }
+            }
+            
+            updateCamera();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate planets
+            planets.forEach((planetGroup, index) => {
+                planetGroup.rotation.y += 0.002 * (index + 1);
+                
+                // Orbital motion
+                if (autoRotate) {
+                    const time = Date.now() * 0.0001;
+                    const data = planetData[index];
+                    const radius = Math.sqrt(data.position.x * data.position.x + data.position.z * data.position.z);
+                    planetGroup.position.x = Math.cos(time * (index + 1) * 0.5) * radius;
+                    planetGroup.position.z = Math.sin(time * (index + 1) * 0.5) * radius;
+                }
+            });
+            
+            // Rotate starfield
+            stars.forEach(star => {
+                star.rotation.y += 0.0001;
+            });
+            
+            renderer.render(scene, camera);
+        }
+
+        // UI Functions
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+        }
+
+        function toggleTimeline() {
+            const menu = document.getElementById('quantumMenu');
+            menu.classList.toggle('active');
+        }
+
+        function resetView() {
+            selectedPlanet = null;
+            document.getElementById('planetInfo').style.display = 'none';
+            animateCameraToPosition(0, 10, 30);
+        }
+
+        function jumpToPlanet(index) {
+            selectPlanet(planetData[index]);
+            document.getElementById('quantumMenu').classList.remove('active');
+        }
+
+        function toggleContactOptions() {
+            document.getElementById('contactOptions').classList.toggle('active');
+        }
+
+        function makeCall() {
+            window.location.href = 'tel:+4915209893729';
+        }
+
+        function sendEmail() {
+            window.location.href = 'mailto:Patrick.Kolb@gmx.de?subject=Kontakt%20via%20Kolb-Universum';
+        }
+
+        function downloadCV() {
+            // Create dynamic CV download
+            alert('CV-Download wird vorbereitet...\n\nIn einer echten Implementation würde hier ein PDF generiert werden.');
+        }
+
+        // Initialize everything
+        init();
+        animate();
+    </script>
+    <!-- Global Navigation -->
+    <script src="global-nav.js"></script>
+    <!-- Patrick Kolb Chat Widget -->
+    <script src="patrick-chatbot.js"></script>
+</body>
+</html>

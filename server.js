@@ -5,7 +5,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 // Enable CORS
 app.use(cors());
@@ -50,7 +50,7 @@ app.listen(PORT, () => {
     console.log(`\n⚡ Drücken Sie Ctrl+C um den Server zu beenden\n`);
     
     // Prüfe ob API Key vorhanden
-    if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'YOUR_API_KEY_HERE') {
+    if (!process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY === 'YOUR_ANTHROPIC_API_KEY_HERE') {
         console.warn('⚠️  WARNUNG: Kein gültiger API-Schlüssel gefunden!');
         console.warn('⚠️  Bitte fügen Sie Ihren Anthropic API-Schlüssel in die .env Datei ein\n');
     }

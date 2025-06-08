@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Palace | Die Gedankenwelt von Patrick Kolb</title>
+    <meta name="description" content="Erkunden Sie die nicht-lineare, kreativ-chaotische Denkweise von Patrick Kolb">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Courier+Prime:wght@400;700&family=Fredoka:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --thought-purple: #8B5CF6;
+            --memory-blue: #3B82F6;
+            --innovation-orange: #F59E0B;
+            --chaos-pink: #EC4899;
+            --wisdom-green: #10B981;
+            --kutter-red: #DC2626;
+            --neural-dark: #111827;
+            --neural-light: #F3F4F6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+        
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: var(--neural-dark);
+            color: var(--neural-light);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--thought-purple);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 0.1s ease;
+            z-index: 10000;
+            mix-blend-mode: difference;
+        }
+        
+        .cursor-trail {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--thought-purple);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0.5;
+            z-index: 9999;
+        }
+        
+        /* Neural Network Background */
+        #neural-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.5;
+        }
+        
+        /* Thought Bubbles */
+        .thought-bubble {
+            position: absolute;
+            background: rgba(139, 92, 246, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: float 6s ease-in-out infinite;
+            cursor: pointer;
+            border: 2px solid rgba(139, 92, 246, 0.3);
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            75% { transform: translateY(20px) rotate(-5deg); }
+        }
+        
+        .thought-bubble:hover {
+            transform: scale(1.2);
+            border-color: var(--thought-purple);
+            box-shadow: 0 0 30px var(--thought-purple);
+        }
+        
+        .thought-bubble.connected {
+            border-color: var(--wisdom-green);
+            box-shadow: 0 0 30px var(--wisdom-green);
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        .thought-content {
+            font-family: 'Kalam', cursive;
+            font-weight: 400;
+            font-size: clamp(0.8rem, 2vw, 1.2rem);
+            color: var(--neural-light);
+        }
+        
+        /* Memory Nodes */
+        .memory-node {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--memory-blue), var(--thought-purple));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.5s ease;
+            z-index: 200;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .memory-node.revealed {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .memory-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .memory-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        /* Innovation Sparks */
+        .innovation-spark {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--innovation-orange);
+            border-radius: 50%;
+            opacity: 0;
+            animation: spark 2s ease-out forwards;
+        }
+        
+        @keyframes spark {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(20);
+            }
+        }
+        
+        /* Central Mind Hub */
+        .mind-hub {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(220, 38, 38, 0.8), rgba(220, 38, 38, 0.2), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            animation: pulse 3s ease-in-out infinite;
+            box-shadow: 0 0 50px rgba(220, 38, 38, 0.5);
+            border: 3px solid rgba(220, 38, 38, 0.8);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        .mind-hub-content {
+            text-align: center;
+        }
+        
+        .mind-hub h1 {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .mind-hub p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        /* Chaos Menu */
+        .chaos-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(17, 24, 39, 0.9);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--chaos-pink);
+            border-radius: 20px;
+            padding: 20px;
+            z-index: 500;
+            min-width: 250px;
+        }
+        
+        .chaos-menu h2 {
+            font-family: 'Kalam', cursive;
+            color: var(--chaos-pink);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .connection-count {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .connection-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .connection-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .connection-progress {
+            height: 100%;
+            background: var(--wisdom-green);
+            transition: width 0.5s ease;
+        }
+        
+        /* Insight Popup */
+        .insight-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--neural-dark);
+            border: 3px solid var(--wisdom-green);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .insight-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .insight-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--wisdom-green);
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+        }
+        
+        .insight-content {
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+        
+        .insight-close {
+            background: var(--wisdom-green);
+            color: var(--neural-dark);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .insight-close:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.5);
+        }
+        
+        /* Contact Constellation */
+        .contact-constellation {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 600;
+        }
+        
+        .constellation-center {
+            width: 80px;
+            height: 80px;
+            background: var(--kutter-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(220, 38, 38, 0.5);
+        }
+        
+        .constellation-center:hover {
+            transform: scale(1.1) rotate(180deg);
+        }
+        
+        .constellation-point {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: var(--neural-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: var(--neural-dark);
+        }
+        
+        .constellation-active .constellation-point {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .constellation-point:nth-child(2) { top: -70px; left: 15px; transition-delay: 0.1s; }
+        .constellation-point:nth-child(3) { top: -40px; right: -60px; transition-delay: 0.2s; }
+        .constellation-point:nth-child(4) { bottom: -40px; right: -60px; transition-delay: 0.3s; }
+        
+        /* Wisdom Quotes */
+        .wisdom-quote {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            max-width: 300px;
+            padding: 20px;
+            background: rgba(139, 92, 246, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--thought-purple);
+            border-radius: 15px;
+            font-family: 'Kalam', cursive;
+            font-style: italic;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            z-index: 400;
+        }
+        
+        .wisdom-quote.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .thought-bubble {
+                min-width: 100px;
+                min-height: 100px;
+                font-size: 0.8rem;
+            }
+            
+            .chaos-menu {
+                top: 10px;
+                right: 10px;
+                padding: 15px;
+                min-width: 200px;
+            }
+            
+            .mind-hub {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .mind-hub h1 {
+                font-size: 1.2rem;
+            }
+        }
+        
+        /* Loading Animation */
+        .neural-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--neural-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 1s ease;
+        }
+        
+        .neural-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader-brain {
+            width: 200px;
+            height: 200px;
+            position: relative;
+        }
+        
+        .synapse {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--thought-purple);
+            border-radius: 50%;
+            animation: synapse-fire 2s ease-in-out infinite;
+        }
+        
+        @keyframes synapse-fire {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(2); opacity: 1; }
+        }
+        
+        .synapse:nth-child(1) { top: 20%; left: 30%; animation-delay: 0s; }
+        .synapse:nth-child(2) { top: 50%; left: 20%; animation-delay: 0.3s; }
+        .synapse:nth-child(3) { top: 70%; left: 40%; animation-delay: 0.6s; }
+        .synapse:nth-child(4) { top: 30%; right: 30%; animation-delay: 0.9s; }
+        .synapse:nth-child(5) { top: 60%; right: 20%; animation-delay: 1.2s; }
+    </style>
+    <link rel="stylesheet" href="global-nav.css">
+</head>
+<body>
+    <!-- Neural Loader -->
+    <div class="neural-loader" id="loader">
+        <div class="loader-brain">
+            <div class="synapse"></div>
+            <div class="synapse"></div>
+            <div class="synapse"></div>
+            <div class="synapse"></div>
+            <div class="synapse"></div>
+            <p style="position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: 'Kalam', cursive;">
+                Lade Gedankenwelt...
+            </p>
+        </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Neural Network Canvas -->
+    <div id="neural-canvas"></div>
+
+    <!-- Central Mind Hub -->
+    <div class="mind-hub">
+        <div class="mind-hub-content">
+            <h1>PATRICK KOLB</h1>
+            <p>Kreativ-Chaotischer<br>Denker</p>
+        </div>
+    </div>
+
+    <!-- Thought Bubbles -->
+    <div id="thoughtContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 50; pointer-events: none;">
+        <div class="thought-bubble" style="width: 140px; height: 140px; top: 15%; left: 25%; pointer-events: all;">
+            <span class="thought-content">Warum nicht mal anders denken?</span>
+        </div>
+        <div class="thought-bubble" style="width: 120px; height: 120px; top: 25%; right: 30%; pointer-events: all;">
+            <span class="thought-content">Chaos ist nur unverstandene Ordnung</span>
+        </div>
+        <div class="thought-bubble" style="width: 160px; height: 160px; bottom: 35%; left: 20%; pointer-events: all;">
+            <span class="thought-content">Vom Maurer zum IT-Visionär</span>
+        </div>
+        <div class="thought-bubble" style="width: 130px; height: 130px; top: 45%; right: 25%; pointer-events: all;">
+            <span class="thought-content">Innovation entsteht im Chaos</span>
+        </div>
+        <div class="thought-bubble" style="width: 150px; height: 150px; bottom: 25%; right: 30%; pointer-events: all;">
+            <span class="thought-content">KI ist mein Werkzeug</span>
+        </div>
+        <div class="thought-bubble" style="width: 110px; height: 110px; top: 65%; left: 30%; pointer-events: all;">
+            <span class="thought-content">Abstrakt = Meine Superkraft</span>
+        </div>
+        <div class="thought-bubble" style="width: 140px; height: 140px; bottom: 45%; right: 20%; pointer-events: all;">
+            <span class="thought-content">Probleme? Ich sehe Lösungen!</span>
+        </div>
+    </div>
+
+    <!-- Memory Nodes (Hidden initially) -->
+    <div id="memoryContainer">
+        <div class="memory-node" style="top: 15%; left: 40%;">
+            <span class="memory-icon">🎖️</span>
+            <span class="memory-text">2003-07: Bundeswehr & IT</span>
+        </div>
+        <div class="memory-node" style="top: 30%; right: 30%;">
+            <span class="memory-icon">💻</span>
+            <span class="memory-text">2016: IT System Engineer</span>
+        </div>
+        <div class="memory-node" style="bottom: 35%; left: 30%;">
+            <span class="memory-icon">🌱</span>
+            <span class="memory-text">2019: Katzengrass-Innovation</span>
+        </div>
+        <div class="memory-node" style="bottom: 25%; right: 40%;">
+            <span class="memory-icon">👑</span>
+            <span class="memory-text">2024: IT-Leiter Prinz</span>
+        </div>
+        <div class="memory-node" style="top: 45%; right: 35%;">
+            <span class="memory-icon">🏗️</span>
+            <span class="memory-text">1999-03: Maurerausbildung</span>
+        </div>
+        <div class="memory-node" style="top: 50%; left: 15%;">
+            <span class="memory-icon">❤️</span>
+            <span class="memory-text">Medizintechnik-Sensor</span>
+        </div>
+    </div>
+
+    <!-- Chaos Menu -->
+    <div class="chaos-menu">
+        <h2>Gedanken-Statistik</h2>
+        <div class="connection-count">
+            <div class="connection-item">
+                <span>Verbindungen</span>
+                <div class="connection-bar">
+                    <div class="connection-progress" id="connectionBar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="connection-item">
+                <span>Erkenntnisse</span>
+                <span id="insightCount">0/5</span>
+            </div>
+            <div class="connection-item">
+                <span>Chaos-Level</span>
+                <span id="chaosLevel">🌪️ Hoch</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Constellation -->
+    <div class="contact-constellation" id="contactConstellation">
+        <div class="constellation-center" onclick="toggleConstellation()">
+            📡
+        </div>
+        <div class="constellation-point" onclick="window.location.href='tel:+4915209893729'">
+            📞
+        </div>
+        <div class="constellation-point" onclick="window.location.href='mailto:Patrick.Kolb@gmx.de'">
+            ✉️
+        </div>
+        <div class="constellation-point" onclick="downloadPDF()">
+            📄
+        </div>
+    </div>
+
+    <!-- Wisdom Quotes -->
+    <div class="wisdom-quote" id="wisdomQuote">
+        "Ich blicke nicht nur über den Tellerrand – ich blicke ins Universum."
+    </div>
+
+    <!-- Insight Popup -->
+    <div class="insight-popup" id="insightPopup">
+        <h2 class="insight-title" id="insightTitle">Erkenntnis Entdeckt!</h2>
+        <div class="insight-content" id="insightContent">
+            <p>Durch das Verbinden der Gedanken haben Sie eine wichtige Erkenntnis über Patrick Kolb freigeschaltet.</p>
+        </div>
+        <button class="insight-close" onclick="closeInsight()">Verstanden!</button>
+    </div>
+
+    <script>
+        // Neural network background using p5.js
+        let neurons = [];
+        let neuralConnections = [];
+        
+        function setup() {
+            let canvas = createCanvas(windowWidth, windowHeight);
+            canvas.parent('neural-canvas');
+            
+            // Create neurons
+            for (let i = 0; i < 50; i++) {
+                neurons.push({
+                    x: random(width),
+                    y: random(height),
+                    vx: random(-1, 1),
+                    vy: random(-1, 1),
+                    size: random(3, 8)
+                });
+            }
+        }
+        
+        function draw() {
+            background(17, 24, 39, 50); // Semi-transparent background
+            
+            // Update and draw neurons
+            neurons.forEach((neuron, i) => {
+                // Movement
+                neuron.x += neuron.vx;
+                neuron.y += neuron.vy;
+                
+                // Bounce off edges
+                if (neuron.x < 0 || neuron.x > width) neuron.vx *= -1;
+                if (neuron.y < 0 || neuron.y > height) neuron.vy *= -1;
+                
+                // Draw connections
+                neurons.forEach((other, j) => {
+                    if (i < j) {
+                        let d = dist(neuron.x, neuron.y, other.x, other.y);
+                        if (d < 150) {
+                            stroke(139, 92, 246, map(d, 0, 150, 100, 0));
+                            strokeWeight(1);
+                            line(neuron.x, neuron.y, other.x, other.y);
+                        }
+                    }
+                });
+                
+                // Draw neuron
+                noStroke();
+                fill(139, 92, 246, 200);
+                ellipse(neuron.x, neuron.y, neuron.size);
+            });
+        }
+        
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+        
+        // Custom cursor
+        const cursor = document.getElementById('cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Create cursor trail
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = mouseX + 'px';
+            trail.style.top = mouseY + 'px';
+            document.body.appendChild(trail);
+            
+            setTimeout(() => trail.remove(), 500);
+        });
+        
+        // Smooth cursor animation
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.1;
+            cursorY += (mouseY - cursorY) * 0.1;
+            
+            cursor.style.left = cursorX - 15 + 'px';
+            cursor.style.top = cursorY - 15 + 'px';
+            
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+        
+        // Thought bubble interactions
+        let selectedBubbles = [];
+        let thoughtConnections = 0;
+        let insights = 0;
+        
+        document.querySelectorAll('.thought-bubble').forEach(bubble => {
+            bubble.addEventListener('click', function() {
+                if (this.classList.contains('connected')) {
+                    this.classList.remove('connected');
+                    selectedBubbles = selectedBubbles.filter(b => b !== this);
+                } else {
+                    this.classList.add('connected');
+                    selectedBubbles.push(this);
+                    
+                    // Create innovation spark
+                    createSpark(this);
+                    
+                    // Check for connections
+                    if (selectedBubbles.length >= 2) {
+                        connectThoughts();
+                    }
+                }
+                
+                updateStats();
+            });
+        });
+        
+        function createSpark(element) {
+            const rect = element.getBoundingClientRect();
+            const spark = document.createElement('div');
+            spark.className = 'innovation-spark';
+            spark.style.left = rect.left + rect.width / 2 + 'px';
+            spark.style.top = rect.top + rect.height / 2 + 'px';
+            document.body.appendChild(spark);
+            
+            setTimeout(() => spark.remove(), 2000);
+        }
+        
+        function connectThoughts() {
+            thoughtConnections++;
+            document.getElementById('connectionBar').style.width = (thoughtConnections * 20) + '%';
+            
+            // Reveal memory nodes progressively
+            if (thoughtConnections === 2) {
+                revealMemoryNode(0);
+                showInsight('Fundament-Erkenntnis', 'Jeder große Bau beginnt mit einem soliden Fundament. Patrick Kolbs Maurerausbildung war der erste Stein seiner beeindruckenden Karriere.');
+            } else if (thoughtConnections === 4) {
+                revealMemoryNode(1);
+                revealMemoryNode(2);
+                showInsight('Transformations-Erkenntnis', 'Die Fähigkeit zur Transformation: Vom Handwerk zur High-Tech, von Steinen zu Servern. Patrick Kolb beweist, dass Wandel möglich ist.');
+            } else if (thoughtConnections === 6) {
+                revealMemoryNode(3);
+                revealMemoryNode(4);
+                showInsight('Innovations-Erkenntnis', 'Innovation kennt keine Grenzen: Katzengrass-System, Medizintechnik-Sensor, KI-Strategien. Patrick Kolb löst Probleme, die andere nicht einmal sehen.');
+            }
+            
+            // Draw connection lines
+            if (selectedBubbles.length === 2) {
+                drawConnection(selectedBubbles[0], selectedBubbles[1]);
+                selectedBubbles = [];
+                document.querySelectorAll('.thought-bubble').forEach(b => b.classList.remove('connected'));
+            }
+        }
+        
+        function drawConnection(bubble1, bubble2) {
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.position = 'fixed';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.style.pointerEvents = 'none';
+            svg.style.zIndex = '50';
+            
+            const rect1 = bubble1.getBoundingClientRect();
+            const rect2 = bubble2.getBoundingClientRect();
+            
+            const x1 = rect1.left + rect1.width / 2;
+            const y1 = rect1.top + rect1.height / 2;
+            const x2 = rect2.left + rect2.width / 2;
+            const y2 = rect2.top + rect2.height / 2;
+            
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const d = `M ${x1} ${y1} Q ${(x1 + x2) / 2} ${(y1 + y2) / 2 - 100} ${x2} ${y2}`;
+            path.setAttribute('d', d);
+            path.setAttribute('stroke', '#10B981');
+            path.setAttribute('stroke-width', '3');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('opacity', '0');
+            
+            svg.appendChild(path);
+            document.body.appendChild(svg);
+            
+            // Animate the path
+            setTimeout(() => {
+                path.style.transition = 'opacity 1s ease';
+                path.setAttribute('opacity', '0.6');
+            }, 100);
+            
+            setTimeout(() => {
+                svg.style.transition = 'opacity 1s ease';
+                svg.style.opacity = '0';
+                setTimeout(() => svg.remove(), 1000);
+            }, 2000);
+        }
+        
+        function revealMemoryNode(index) {
+            const nodes = document.querySelectorAll('.memory-node');
+            if (nodes[index]) {
+                nodes[index].classList.add('revealed');
+            }
+        }
+        
+        function showInsight(title, content) {
+            insights++;
+            document.getElementById('insightCount').textContent = insights + '/5';
+            document.getElementById('insightTitle').textContent = title;
+            document.getElementById('insightContent').innerHTML = `<p>${content}</p>`;
+            document.getElementById('insightPopup').classList.add('show');
+            
+            // Update chaos level
+            const chaosLevels = ['🌪️ Hoch', '🌊 Mittel', '☁️ Niedrig', '✨ Transzendent', '🌟 Genial'];
+            document.getElementById('chaosLevel').textContent = chaosLevels[insights - 1] || chaosLevels[0];
+        }
+        
+        function closeInsight() {
+            document.getElementById('insightPopup').classList.remove('show');
+        }
+        
+        function updateStats() {
+            // Update connection visualization
+            const progress = Math.min(thoughtConnections * 20, 100);
+            document.getElementById('connectionBar').style.width = progress + '%';
+        }
+        
+        // Contact constellation
+        function toggleConstellation() {
+            document.getElementById('contactConstellation').classList.toggle('constellation-active');
+        }
+        
+        // Wisdom quotes rotation
+        const wisdomQuotes = [
+            "Ich blicke nicht nur über den Tellerrand – ich blicke ins Universum.",
+            "Chaos ist nur unverstandene Ordnung.",
+            "Aus scheinbarem Chaos entstehen meine besten Ideen.",
+            "Innovation entsteht, wenn man Unmögliches möglich macht.",
+            "Mein Weg ist unkonventionell – genau wie meine Lösungen."
+        ];
+        
+        let quoteIndex = 0;
+        function rotateQuotes() {
+            const quoteElement = document.getElementById('wisdomQuote');
+            quoteElement.classList.remove('show');
+            
+            setTimeout(() => {
+                quoteElement.textContent = wisdomQuotes[quoteIndex];
+                quoteElement.classList.add('show');
+                quoteIndex = (quoteIndex + 1) % wisdomQuotes.length;
+            }, 500);
+        }
+        
+        // Show first quote
+        setTimeout(() => {
+            document.getElementById('wisdomQuote').classList.add('show');
+        }, 2000);
+        
+        // Rotate quotes every 5 seconds
+        setInterval(rotateQuotes, 5000);
+        
+        // Download PDF function
+        function downloadPDF() {
+            alert('Mind Map PDF wird generiert...\n\nEine visuelle Darstellung der Gedankenwelt und Karriere von Patrick Kolb.');
+        }
+        
+        // Hide loader after initialization
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 2000);
+        });
+        
+        // Add floating animation variation to thought bubbles
+        document.querySelectorAll('.thought-bubble').forEach((bubble, index) => {
+            bubble.style.animationDelay = (index * 0.5) + 's';
+            bubble.style.animationDuration = (6 + index * 0.5) + 's';
+        });
+        
+        // Interactive hover effects for memory nodes
+        document.querySelectorAll('.memory-node').forEach(node => {
+            node.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1) rotate(5deg)';
+            });
+            
+            node.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+    </script>
+    <!-- Global Navigation -->
+    <script src="global-nav.js"></script>
+    <!-- Patrick Kolb Chat Widget -->
+    <script src="patrick-chatbot.js"></script>
+</body>
+</html>

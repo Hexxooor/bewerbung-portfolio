@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metamorphose | Von Stein zu Code - Patrick Kolb</title>
+    <meta name="description" content="Erleben Sie die außergewöhnliche Transformation von Patrick Kolb - vom Handwerk zur digitalen Innovation">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Code+Pro:wght@400;700&family=Montserrat:wght@300;400;700;900&display=swap');
+        
+        :root {
+            --brick-red: #8B4513;
+            --mortar-gray: #696969;
+            --code-green: #00ff00;
+            --binary-blue: #00ffff;
+            --transform-purple: #9D4EDD;
+            --kutter-red: #d40024;
+            --stone-texture: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' fill='%238B4513'/%3E%3Cpath d='M0 0L50 50L0 100M50 0L100 50L50 100' stroke='%23654321' fill='none'/%3E%3C/svg%3E");
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* Falling Bricks Animation */
+        .brick {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            background: var(--stone-texture), var(--brick-red);
+            border: 2px solid var(--mortar-gray);
+            animation: fall linear forwards;
+            transform-origin: center;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+            }
+        }
+        
+        .brick.transforming {
+            animation: none;
+            transition: all 2s ease-out;
+        }
+        
+        /* Binary Rain Effect */
+        .binary-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+        
+        .binary-rain.active {
+            opacity: 1;
+        }
+        
+        .binary-drop {
+            position: absolute;
+            color: var(--code-green);
+            font-family: 'Source Code Pro', monospace;
+            font-size: 18px;
+            animation: rain 3s linear infinite;
+            text-shadow: 0 0 5px var(--code-green);
+        }
+        
+        @keyframes rain {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+        
+        /* Sections */
+        .section {
+            min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(180deg, var(--brick-red) 0%, #000 100%);
+        }
+        
+        .hero-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: clamp(3rem, 10vw, 8rem);
+            text-align: center;
+            line-height: 1;
+            position: relative;
+            z-index: 20;
+        }
+        
+        .hero-title span {
+            display: block;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            text-align: center;
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            color: #ccc;
+        }
+        
+        /* Transformation Section */
+        .transform-section {
+            background: linear-gradient(180deg, #000 0%, var(--transform-purple) 50%, #000 100%);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .transform-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 600px;
+            margin: 0 auto;
+        }
+        
+        .stone-wall {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            height: 400px;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+        
+        .stone {
+            background: var(--stone-texture), var(--brick-red);
+            border: 3px solid var(--mortar-gray);
+            opacity: 1;
+            transition: all 1s ease;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .stone.dissolving {
+            opacity: 0;
+            transform: scale(0) rotate(180deg);
+        }
+        
+        .code-particle {
+            position: absolute;
+            font-family: 'Source Code Pro', monospace;
+            color: var(--code-green);
+            font-size: 16px;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            text-shadow: 0 0 10px var(--code-green);
+            white-space: nowrap;
+            z-index: 100;
+        }
+        
+        .code-particle.active {
+            animation: codeFloat 3s ease-out forwards;
+        }
+        
+        @keyframes codeFloat {
+            0% {
+                opacity: 0;
+                transform: scale(0) translateY(0) rotate(0deg);
+            }
+            30% {
+                opacity: 1;
+                transform: scale(1) translateY(-100px) rotate(180deg);
+            }
+            70% {
+                opacity: 1;
+                transform: scale(1.2) translateY(-300px) rotate(360deg);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5) translateY(-500px) rotate(540deg);
+            }
+        }
+        
+        /* Timeline Section */
+        .timeline-section {
+            background: #000;
+            padding: 100px 0;
+        }
+        
+        .timeline-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            padding: 0 50px;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--brick-red), var(--transform-purple), var(--code-green));
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 100px;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .timeline-item:nth-child(odd) {
+            padding-right: 50%;
+            text-align: right;
+        }
+        
+        .timeline-item:nth-child(even) {
+            padding-left: 50%;
+            text-align: left;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: var(--kutter-red);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px var(--kutter-red);
+            z-index: 10;
+        }
+        
+        .timeline-content {
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .timeline-year {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2rem;
+            color: var(--kutter-red);
+            margin-bottom: 10px;
+        }
+        
+        .timeline-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-description {
+            color: #ccc;
+            line-height: 1.6;
+        }
+        
+        /* Skills Visualization */
+        .skills-section {
+            background: linear-gradient(180deg, #000 0%, #111 100%);
+            padding: 100px 0;
+        }
+        
+        .skill-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 50px;
+        }
+        
+        .skill-cube {
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--transform-purple);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-cube:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(157, 78, 221, 0.3);
+        }
+        
+        .skill-cube::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: linear-gradient(45deg, transparent, var(--code-green), transparent);
+            transition: all 0.5s ease;
+            transform: rotate(45deg);
+        }
+        
+        .skill-cube:hover::before {
+            top: -50%;
+            left: -50%;
+        }
+        
+        .skill-name {
+            font-family: 'Source Code Pro', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            z-index: 2;
+            margin-bottom: 10px;
+        }
+        
+        .skill-level {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--code-green);
+            z-index: 2;
+        }
+        
+        /* Contact Section */
+        .contact-section {
+            background: var(--kutter-red);
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .contact-title {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 4rem;
+            margin-bottom: 30px;
+        }
+        
+        .contact-buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 50px;
+        }
+        
+        .contact-btn {
+            padding: 20px 40px;
+            background: #fff;
+            color: var(--kutter-red);
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .contact-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: #000;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s ease;
+        }
+        
+        .contact-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .contact-btn:hover {
+            color: #fff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .contact-btn span {
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Floating Action Menu */
+        .fab-menu {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        
+        .fab-main {
+            width: 70px;
+            height: 70px;
+            background: var(--kutter-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .fab-main:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(212, 0, 36, 0.5);
+        }
+        
+        .fab-main svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .fab-menu.open .fab-main svg {
+            transform: rotate(45deg);
+        }
+        
+        .fab-options {
+            position: absolute;
+            bottom: 85px;
+            right: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .fab-menu.open .fab-options {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .fab-option {
+            width: 55px;
+            height: 55px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        
+        .fab-menu.open .fab-option {
+            transform: scale(1);
+        }
+        
+        .fab-menu.open .fab-option:nth-child(1) { transition-delay: 0.1s; }
+        .fab-menu.open .fab-option:nth-child(2) { transition-delay: 0.2s; }
+        .fab-menu.open .fab-option:nth-child(3) { transition-delay: 0.3s; }
+        
+        .fab-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .fab-option svg {
+            width: 25px;
+            height: 25px;
+            fill: var(--kutter-red);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .timeline-line {
+                left: 30px;
+            }
+            
+            .timeline-item {
+                padding-left: 60px !important;
+                padding-right: 20px !important;
+                text-align: left !important;
+            }
+            
+            .timeline-dot {
+                left: 30px;
+            }
+            
+            .skill-matrix {
+                grid-template-columns: 1fr;
+                padding: 0 20px;
+            }
+            
+            .contact-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="global-nav.css">
+</head>
+<body>
+    <!-- Binary Rain Background -->
+    <div class="binary-rain" id="binaryRain"></div>
+
+    <!-- Falling Bricks Container -->
+    <div id="bricksContainer"></div>
+
+    <!-- Hero Section -->
+    <section class="section hero-section">
+        <div class="container">
+            <h1 class="hero-title">
+                <span>VON STEIN</span>
+                <span>ZU CODE</span>
+            </h1>
+            <p class="subtitle">Die außergewöhnliche Metamorphose des Patrick Kolb</p>
+        </div>
+    </section>
+
+    <!-- Transformation Section -->
+    <section class="section transform-section">
+        <div class="transform-container">
+            <div class="stone-wall" id="stoneWall"></div>
+            <div id="codeParticles"></div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline-section">
+        <div class="timeline-container">
+            <div class="timeline-line"></div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2024 - HEUTE</div>
+                    <h3 class="timeline-title">IT-Leiter bei Prinz</h3>
+                    <p class="timeline-description">
+                        Die vollständige Transformation: Verantwortung für die gesamte IT-Strategie. 
+                        12 Mitarbeiter, Millionen-Budget, digitale Revolution.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2020 - 2023</div>
+                    <h3 class="timeline-title">Head of IT bei Grass</h3>
+                    <p class="timeline-description">
+                        25-köpfiges globales Team. Migration zu Microsoft 365. 
+                        40% schnellere Ticketbearbeitung durch Jira Implementation.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2019 - HEUTE</div>
+                    <h3 class="timeline-title">Erfinder & Innovator</h3>
+                    <p class="timeline-description">
+                        Parallel zur Karriere: Katzengrass-Innovation, Medizintechnik-Sensor. 
+                        Wo andere Probleme sehen, erschaffe ich Lösungen.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2016 - 2019</div>
+                    <h3 class="timeline-title">IT System Engineer</h3>
+                    <p class="timeline-description">
+                        800+ Clients. Erste Automatisierungen mit PowerShell. 
+                        Der Code beginnt zu fließen.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2011 - 2016</div>
+                    <h3 class="timeline-title">Der Übergang</h3>
+                    <p class="timeline-description">
+                        Von der Glaserei Nuber zur Technik. Die ersten digitalen Schritte. 
+                        Handwerk trifft auf Technologie.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">1999 - 2003</div>
+                    <h3 class="timeline-title">Maurer-Ausbildung</h3>
+                    <p class="timeline-description">
+                        Der wahre Anfang. Jeder Stein ein Baustein meiner Zukunft. 
+                        Hier lernte ich die Baubranche von der Pike auf kennen.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">2003 - 2007</div>
+                    <h3 class="timeline-title">Bundeswehr & IT-Ausbildung</h3>
+                    <p class="timeline-description">
+                        Nach dem Handwerk kam die Technik: Fernmeldetechniker bei der Bundeswehr, 
+                        dann IT-Systemelektroniker bei DEKRA. Disziplin trifft Technologie.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="skills-section">
+        <div class="container">
+            <h2 class="hero-title" style="font-size: 4rem; margin-bottom: 50px;">
+                <span>FÄHIGKEITEN-MATRIX</span>
+            </h2>
+            <div class="skill-matrix">
+                <div class="skill-cube">
+                    <div class="skill-name">IT-STRATEGIE</div>
+                    <div class="skill-level">95%</div>
+                </div>
+                <div class="skill-cube">
+                    <div class="skill-name">TEAMFÜHRUNG</div>
+                    <div class="skill-level">90%</div>
+                </div>
+                <div class="skill-cube">
+                    <div class="skill-name">CLOUD & KI</div>
+                    <div class="skill-level">85%</div>
+                </div>
+                <div class="skill-cube">
+                    <div class="skill-name">INNOVATION</div>
+                    <div class="skill-level">98%</div>
+                </div>
+                <div class="skill-cube">
+                    <div class="skill-name">PROJEKTMGMT</div>
+                    <div class="skill-level">92%</div>
+                </div>
+                <div class="skill-cube">
+                    <div class="skill-name">ABSTRAKT</div>
+                    <div class="skill-level">100%</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <h2 class="contact-title">BEREIT FÜR DIE TRANSFORMATION?</h2>
+        <p style="font-size: 1.5rem; margin-bottom: 30px;">
+            Lassen Sie uns gemeinsam Kutter in die digitale Zukunft führen.
+        </p>
+        <div class="contact-buttons">
+            <button class="contact-btn" onclick="window.location.href='tel:+4915209893729'">
+                <span>📞 ANRUFEN</span>
+            </button>
+            <button class="contact-btn" onclick="window.location.href='mailto:Patrick.Kolb@gmx.de'">
+                <span>✉️ E-MAIL</span>
+            </button>
+            <button class="contact-btn" onclick="downloadPDF()">
+                <span>📄 LEBENSLAUF</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Floating Action Menu -->
+    <div class="fab-menu" id="fabMenu">
+        <div class="fab-main" onclick="toggleFabMenu()">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 4v16m8-8H4"/>
+            </svg>
+        </div>
+        <div class="fab-options">
+            <div class="fab-option" onclick="window.location.href='tel:+4915209893729'" title="Anrufen">
+                <svg viewBox="0 0 24 24">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+            </div>
+            <div class="fab-option" onclick="window.location.href='mailto:Patrick.Kolb@gmx.de'" title="E-Mail">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                </svg>
+            </div>
+            <div class="fab-option" onclick="downloadPDF()" title="PDF Download">
+                <svg viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="12" y1="18" x2="12" y2="12"/>
+                    <line x1="9" y1="15" x2="12" y2="18"/>
+                    <line x1="15" y1="15" x2="12" y2="18"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize GSAP ScrollTrigger
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Create falling bricks
+        function createBrick() {
+            const brick = document.createElement('div');
+            brick.className = 'brick';
+            brick.style.left = Math.random() * window.innerWidth + 'px';
+            brick.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.getElementById('bricksContainer').appendChild(brick);
+            
+            setTimeout(() => brick.remove(), 5000);
+        }
+
+        // Create bricks periodically
+        const brickInterval = setInterval(createBrick, 200);
+
+        // Stop bricks after scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > window.innerHeight) {
+                clearInterval(brickInterval);
+            }
+        });
+
+        // Create binary rain
+        function createBinaryRain() {
+            const container = document.getElementById('binaryRain');
+            const columns = Math.floor(window.innerWidth / 20);
+            
+            for (let i = 0; i < columns; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'binary-drop';
+                drop.style.left = i * 20 + 'px';
+                drop.style.animationDelay = Math.random() * 3 + 's';
+                drop.textContent = Math.random() > 0.5 ? '1' : '0';
+                container.appendChild(drop);
+            }
+        }
+
+        createBinaryRain();
+
+        // Activate binary rain on scroll
+        ScrollTrigger.create({
+            trigger: '.transform-section',
+            start: 'top center',
+            onEnter: () => document.getElementById('binaryRain').classList.add('active')
+        });
+
+        // Create stone wall
+        function createStoneWall() {
+            const wall = document.getElementById('stoneWall');
+            for (let i = 0; i < 48; i++) { // 8x6 grid = 48 stones
+                const stone = document.createElement('div');
+                stone.className = 'stone';
+                stone.style.animationDelay = Math.random() * 0.5 + 's';
+                wall.appendChild(stone);
+            }
+        }
+
+        createStoneWall();
+
+        // Transform stones to code
+        ScrollTrigger.create({
+            trigger: '.transform-section',
+            start: 'center center',
+            onEnter: () => transformStonesToCode()
+        });
+
+        function transformStonesToCode() {
+            const stones = document.querySelectorAll('.stone');
+            const particlesContainer = document.getElementById('codeParticles');
+            const codeSnippets = [
+                'function transform()',
+                'const future = "digital"',
+                'if (stone) return code;',
+                'class Innovation {}',
+                'async await success()',
+                '01010000 01001011',
+                'git commit -m "evolution"',
+                'npm install future',
+                '</> Hello World </>',
+                'AI.think(abstract)',
+                'while(true) innovate();',
+                'return new Promise();',
+                'const kolb = "visionary";',
+                'Matrix.transform(reality);'
+            ];
+            
+            stones.forEach((stone, index) => {
+                setTimeout(() => {
+                    stone.classList.add('dissolving');
+                    
+                    // Get stone position relative to container
+                    const rect = stone.getBoundingClientRect();
+                    const containerRect = particlesContainer.getBoundingClientRect();
+                    
+                    // Create 1-2 particles per stone for less overlap
+                    const particleCount = Math.floor(Math.random() * 2) + 1;
+                    
+                    for (let i = 0; i < particleCount; i++) {
+                        const particle = document.createElement('div');
+                        particle.className = 'code-particle';
+                        particle.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+                        
+                        // Position particle at stone location with some random offset
+                        const offsetX = (Math.random() - 0.5) * 100;
+                        const offsetY = (Math.random() - 0.5) * 50;
+                        
+                        particle.style.left = (rect.left - containerRect.left + rect.width/2 + offsetX) + 'px';
+                        particle.style.bottom = (containerRect.bottom - rect.bottom + rect.height/2 + offsetY) + 'px';
+                        
+                        particlesContainer.appendChild(particle);
+                        
+                        setTimeout(() => {
+                            particle.classList.add('active');
+                        }, i * 200);
+                        
+                        setTimeout(() => particle.remove(), 3000);
+                    }
+                }, index * 50); // Faster sequence
+            });
+        }
+
+        // Animate hero title
+        gsap.to('.hero-title span', {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            stagger: 0.3,
+            ease: 'power3.out'
+        });
+
+        gsap.to('.subtitle', {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: 0.8,
+            ease: 'power3.out'
+        });
+
+        // Animate timeline items
+        gsap.utils.toArray('.timeline-item').forEach(item => {
+            gsap.to(item, {
+                opacity: 1,
+                y: 0,
+                duration: 1,
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 80%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play none none reverse'
+                }
+            });
+        });
+
+        // Animate skill cubes
+        gsap.utils.toArray('.skill-cube').forEach((cube, index) => {
+            gsap.from(cube, {
+                scale: 0,
+                rotation: 180,
+                duration: 1,
+                delay: index * 0.1,
+                scrollTrigger: {
+                    trigger: '.skills-section',
+                    start: 'top 60%'
+                }
+            });
+        });
+
+        // FAB Menu Toggle
+        function toggleFabMenu() {
+            document.getElementById('fabMenu').classList.toggle('open');
+        }
+
+        // Download PDF function
+        function downloadPDF() {
+            alert('PDF-Download wird vorbereitet...\n\nDiese Funktion würde ein dynamisches PDF mit allen Bewerbungsunterlagen generieren.');
+        }
+
+        // Close FAB menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const fabMenu = document.getElementById('fabMenu');
+            if (!fabMenu.contains(e.target)) {
+                fabMenu.classList.remove('open');
+            }
+        });
+
+        // Parallax effect for sections
+        gsap.utils.toArray('.section').forEach(section => {
+            gsap.to(section, {
+                backgroundPosition: '50% 100%',
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: true
+                }
+            });
+        });
+    </script>
+    <!-- Global Navigation -->
+    <script src="global-nav.js"></script>
+    <!-- Patrick Kolb Chat Widget -->
+    <script src="patrick-chatbot.js"></script>
+</body>
+</html>
