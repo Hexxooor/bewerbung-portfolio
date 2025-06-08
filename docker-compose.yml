@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # Haupt-Bewerbungswebsite
+  bewerbung-web:
+    build: .
+    container_name: patrick-bewerbung
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Nginx Reverse Proxy (optional, für mehrere Services)
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - bewerbung-web
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Zusätzlicher Service Beispiel (z.B. Analytics)
+  # analytics:
+  #   image: plausible/analytics:latest
+  #   container_name: analytics
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - BASE_URL=https://analytics.yourdomain.com
+  #   restart: unless-stopped
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+    driver: bridge
