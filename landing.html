@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patrick Kolb - Bewerbung KI & Digitalisierung | KUTTER AG</title>
+    <meta name="description" content="Bewerbung von Patrick Kolb für die Position als KI-Manager oder eine Führungsposition in der Digitalisierung bei der KUTTER AG.">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #d40024;
+            --primary-dark: #b30020;
+            --secondary: #1a1a1a;
+            --background: #ffffff;
+            --text: #1a1a1a;
+            --text-light: #666666;
+            --border: #e5e5e5;
+            --ai-blue: #0080ff;
+            --digital-green: #00c896;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+            position: relative;
+            line-height: 1.6;
+        }
+        
+        /* Subtle Digital Background Pattern */
+        .digital-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.02;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(0,128,255,.1) 35px, rgba(0,128,255,.1) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(212,0,36,.1) 35px, rgba(212,0,36,.1) 70px);
+            z-index: 1;
+        }
+        
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .company-info {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+        
+        .position-badges {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .position-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        /* Hero Section */
+        .hero {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+        }
+        
+        .hero-content {
+            text-align: center;
+            max-width: 1000px;
+            width: 100%;
+        }
+        
+        .application-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, var(--ai-blue), var(--digital-green));
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+        
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        .hero-title .highlight {
+            color: var(--primary);
+        }
+        
+        .hero-title .ai-highlight {
+            background: linear-gradient(135deg, var(--ai-blue), var(--digital-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            font-weight: 400;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+        
+        .application-options {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+        
+        .option-tag {
+            background: #f3f4f6;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .option-tag.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .qualification-points {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 3rem 0;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.5s both;
+        }
+        
+        .qualification-point {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        .qualification-point .icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        /* Choice Cards */
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+        
+        .choice-card {
+            position: relative;
+            padding: 2.5rem;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .choice-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(212, 0, 36, 0.15);
+        }
+        
+        .choice-card.recommended {
+            border-color: var(--primary);
+            position: relative;
+        }
+        
+        .choice-card.recommended::before {
+            content: 'EMPFOHLEN';
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 0.25rem 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+        
+        .choice-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        
+        .choice-card:hover .choice-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .choice-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        
+        .choice-description {
+            color: var(--text-light);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .choice-btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .choice-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.02);
+        }
+        
+        /* Key Skills Section */
+        .key-skills {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 3rem;
+            background: #f8f8f8;
+            border-radius: 12px;
+            animation: fadeInUp 0.8s ease-out 0.7s both;
+        }
+        
+        .skills-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--text);
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+        
+        .skill-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--ai-blue), var(--digital-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        /* Contact Info */
+        .contact-info {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 2rem;
+            animation: fadeInUp 0.8s ease-out 0.8s both;
+        }
+        
+        .contact-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+        
+        .contact-details {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+        }
+        
+        .contact-item a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.875rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .position-badges {
+                justify-content: center;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .qualification-points {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+            
+            .choices {
+                grid-template-columns: 1fr;
+            }
+            
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-details {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Digital Pattern Background -->
+    <div class="digital-pattern"></div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="company-info">
+                    Bewerbung für die KUTTER AG
+                </div>
+                <div class="position-badges">
+                    <div class="position-badge">
+                        KI-Manager (m/w/d)
+                    </div>
+                    <div class="position-badge">
+                        Digitalisierung & Innovation
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="application-badge">
+                    <span class="badge-dot"></span>
+                    <span>Bewerbung für KI & Digitalisierung bei KUTTER</span>
+                </div>
+                
+                <h1 class="hero-title">
+                    Ich bin <span class="highlight">Patrick Kolb</span><br>
+                    Ihr <span class="ai-highlight">KI-Experte & Digitalisierungs-Architekt</span>
+                </h1>
+                
+                <p class="hero-subtitle">
+                    Mit über 20 Jahren IT-Erfahrung und innovativer KI-Kompetenz<br>
+                    bringe ich Ihre digitale Transformation auf das nächste Level.
+                </p>
+                
+                <div class="application-options">
+                    <span class="option-tag active">🎯 Direkt: KI-Manager Position</span>
+                    <span class="option-tag">💡 Initiativ: Digitalisierung & Führung</span>
+                </div>
+                
+                <div class="qualification-points">
+                    <div class="qualification-point">
+                        <span class="icon">🤖</span>
+                        <span>KI-Implementierung</span>
+                    </div>
+                    <div class="qualification-point">
+                        <span class="icon">🚀</span>
+                        <span>Digitale Transformation</span>
+                    </div>
+                    <div class="qualification-point">
+                        <span class="icon">👥</span>
+                        <span>Führungserfahrung</span>
+                    </div>
+                    <div class="qualification-point">
+                        <span class="icon">💡</span>
+                        <span>Innovationsgeist</span>
+                    </div>
+                </div>
+                
+                <!-- Choice Cards -->
+                <div class="choices">
+                    <!-- Standard Application -->
+                    <div class="choice-card recommended" onclick="window.location.href='kutter-bewerbung.html'">
+                        <div class="choice-icon">📋</div>
+                        <h2 class="choice-title">Klassische Bewerbung</h2>
+                        <p class="choice-description">
+                            Alle relevanten Informationen strukturiert aufbereitet. 
+                            Fokus auf KI-Expertise und Digitalisierungserfahrung.
+                        </p>
+                        <a href="kutter-bewerbung.html" class="choice-btn">Bewerbung ansehen</a>
+                    </div>
+                    
+                    <!-- Gamification Experience -->
+                    <div class="choice-card" onclick="window.location.href='index.html'">
+                        <div class="choice-icon">🎮</div>
+                        <h2 class="choice-title">Interaktive Erfahrung</h2>
+                        <p class="choice-description">
+                            Erleben Sie meine digitale Kompetenz hautnah. 
+                            Drei innovative Wege zeigen meine technische Kreativität.
+                        </p>
+                        <a href="index.html" class="choice-btn">Erlebnis starten</a>
+                    </div>
+                </div>
+                
+                <!-- Key Skills -->
+                <div class="key-skills">
+                    <h3 class="skills-title">Meine Kernkompetenzen für Ihre KI-Strategie</h3>
+                    <div class="skills-grid">
+                        <div class="skill-item">
+                            <span class="skill-icon">✓</span>
+                            <span>ChatGPT & Claude Integration</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-icon">✓</span>
+                            <span>Process Mining & Automation</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-icon">✓</span>
+                            <span>Digitale Strategieentwicklung</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-icon">✓</span>
+                            <span>Change Management</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-icon">✓</span>
+                            <span>IT-Security & Compliance</span>
+                        </div>
+                        <div class="skill-item">
+                            <span class="skill-icon">✓</span>
+                            <span>Agile Projektführung</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="contact-info">
+                    <h3 class="contact-title">Lassen Sie uns über Ihre digitale Zukunft sprechen</h3>
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <span>📧</span>
+                            <a href="mailto:Patrick.Kolb@gmx.de?subject=KI-Manager%20Position%20KUTTER">Patrick.Kolb@gmx.de</a>
+                        </div>
+                        <div class="contact-item">
+                            <span>📱</span>
+                            <a href="tel:+4915209893729">+49 152 09893729</a>
+                        </div>
+                        <div class="contact-item">
+                            <span>📍</span>
+                            <span>88131 Lindau (Bodensee)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2025 Patrick Kolb • Bewerbung als KI-Manager / Digitalisierungsexperte bei der KUTTER AG</p>
+        </footer>
+    </div>
+    
+    <!-- Patrick Kolb Chat Widget -->
+    <script src="patrick-chatbot.js"></script>
+</body>
+</html>
